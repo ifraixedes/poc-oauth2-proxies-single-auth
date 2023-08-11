@@ -1,0 +1,62 @@
+---
+version: "3.7"
+
+services:
+  reverse-proxy:
+    image: caddy:2.6.2
+    container_name: caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
+      - ./caddy/data:/data/caddy
+      - ./caddy/config:/config/caddy
+    network_mode: host
+    environment:
+      BASE_DOMAIN: ${IFRAIXEDES_BASE_DOMAIN}
+
+  oauth2-proxy-select:
+    image: bitnami/oauth2-proxy:7.4.0
+    container_name: oauth2-proxy-select
+    restart: unless-stopped
+    ports:
+      - "4180:4180"
+    command:
+      - --http-address=http://0.0.0.0:4180
+      - --upstream=http://127.0.0.1:8090
+      - --email-domain=${IFRAIXEDES_EMAIL_DOMAIN}
+      - --reverse-proxy=true
+      - --cookie-secret=0123456789ABCDEF
+      - --cookie-secure=true
+      - --cookie-samesite=lax
+      - --cookie-domain=${IFRAIXEDES_BASE_DOMAIN}
+      - --provider=google
+      - --client-id=${IFRAIXEDES_OAUTH2_CLIENT_ID}
+      - --client-secret=${IFRAIXEDES_OAUTH2_CLIENT_SECRET}
+    network_mode: host
+    depends_on:
+      - reverse-proxy
+
+  oauth2-proxy-functional:
+    image: bitnami/oauth2-proxy:7.4.0
+    container_name: oauth2-proxy-functional
+    restart: unless-stopped
+    ports:
+      - "4181:4181"
+    command:
+      - --http-address=http://0.0.0.0:4181
+      - --upstream=http://127.0.0.1:8091
+      - --email-domain=${IFRAIXEDES_EMAIL_DOMAIN}
+      - --reverse-proxy=true
+      - --cookie-secret=0123456789ABCDEF
+      - --cookie-secure=true
+      - --cookie-samesite=lax
+      - --cookie-domain=${IFRAIXEDES_BASE_DOMAIN}
+      - --provider=google
+      - --client-id=${IFRAIXEDES_OAUTH2_CLIENT_ID}
+      - --client-secret=${IFRAIXEDES_OAUTH2_CLIENT_SECRET}
+    network_mode: host
+    depends_on:
+      - reverse-proxy

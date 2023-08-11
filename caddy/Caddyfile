@@ -1,0 +1,11 @@
+{
+  acme_ca https://acme-staging-v02.api.letsencrypt.org/directory
+}
+
+{$BASE_DOMAIN} {
+  reverse_proxy 127.0.0.1:4180
+}
+
+functional.{$BASE_DOMAIN} {
+  reverse_proxy 127.0.0.1:4181
+}
