@@ -53,7 +53,7 @@ At this point you can navigate to the service that shows the list of services to
 `https://my-base-domain.test`. Oauth2-proxy will present you the login screen and if it successfully
 you'll be redirected to the "selector" service.
 
-Click for accessing the "functional" service. You cand access without having to log in again if you
+Click for accessing the "functional" service. You can access without having to log in again if you
 navigate to its specific URL `https://functional.my-base-domain.test`.
 
 If you want to see if you can access to one of the services without having a valid authentication
@@ -66,7 +66,7 @@ services without having to login again as before.
 
 I wanted to have a bunch of services:
 - Only accessible after an Oauth2 login.
-- Running in different regions.
+- Running in different regions, but served under the same base (sub-)domain.
 - Each service with it's Oauth2-proxy, for not having a single one and having to peer networks and
   no single point of failure for the authentication service.
 - All of them accessible with the same Oauth2 credentials.
