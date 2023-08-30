@@ -130,3 +130,27 @@ When I was doing this proof of concept, I realized:
 - All your services ("selector" and "functional") must be hosted under the same base (sub-)domain.
   This is needed because otherwise the authentication cookies won't be send across the different
   services because of the browser security restrictions.
+
+### Using "restrict auth to Google groups on your domain (optional)"
+
+This proof-of-concept doesn't contain the configurations needed for
+"[Restrict auth to specific Google groups on your domain. (optional)](https://oauth2-proxy.github.io/oauth2-proxy/docs/configuration/oauth_provider#restrict-auth-to-specific-google-groups-on-your-domain-optional)",
+however, I used it for tinkering with that set-up and I highlight a few things that I consider that
+are good to bear in mind despite some of them may be obvious for someone:
+- You need to pass the following arguments or their corresponding environment variables:
+  `google-admin-email`, `google-service-account-json`, and `google-group` (this one multiple times
+  if you're designing more than one group).
+- NOTE at the time that I set this up, the corresponding environment variable for the `google-group`
+  argument should be according to the documentation `OAUTH2_PROXY_GOOGLE_GROUPS` (trailing `S`),
+  however, it's `OAUTH2_PROXY_GOOGLE_GROUP`(no trailing `S`). See
+  https://github.com/oauth2-proxy/oauth2-proxy/issues/2201
+- Passing multiple values, when using arguments, you must pass them multiple times, when using
+  environment variables, you have to separate the values with commas (i.e. `,`).
+- The proxy sends the Google groups that are configured and the user belongs to through the header
+  `X-Forwarded-Groups` separated with commas when there is more than one. For example:
+  - Proxy has configured the groups `managers@example.test`, `engineers@example.test`, and
+  `employees@example.test`.
+  - The user belongs to `engineers@example.test` and `employees@example.test`.
+  - Proxy sends to the upstream services `X-Forwared-Groups:
+    engineers@example.test,employees@example.test`.
+- The proxy denies the access to users who don't belong to any of the configured groups.
